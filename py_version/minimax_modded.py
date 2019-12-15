@@ -170,7 +170,7 @@ def render(state, c_choice, h_choice):
     Print the board on console
     :param state: current state of the board
     """
-    print('render',state, c_choice, h_choice)#DEBUG
+    
     #render [[0, 0, 0], [0, 0, 0], [0, 0, 0]] O X
 
     chars = {
@@ -179,7 +179,7 @@ def render(state, c_choice, h_choice):
         0: ' '
     }
     str_line = '---------------'
-
+    print('render',state, c_choice, h_choice)#DEBUG
     print('\n' + str_line)
     for row in state:
         for cell in row:
@@ -216,7 +216,33 @@ def ai_turn(c_choice, h_choice):
     set_move(x, y, COMP) #< - make the move
     time.sleep(1)
 
+def ai_turn_h(h_choice, c_choice):
+    """
+    It calls the minimax function if the depth < 9,
+    else it choices a random coordinate.
+    :param c_choice: computer's choice X or O
+    :param h_choice: human's choice X or O
+    :return:
+    """
+    depth = len(empty_cells(board))
+    print('depth',depth)#DEBUG
+    if depth == 0 or game_over(board):
+        return
 
+    #clean()
+    print(f'Computer turn [{c_choice}]')
+    render(board, c_choice, h_choice)
+
+    if depth == 9: #< - end game?
+        x = choice([0, 1, 2])
+        y = choice([0, 1, 2])
+    else: # < - minimax!
+        move = minimax(board, depth, HUMAN)#changed
+        print('move_minimax: ',move)#DEGUB
+        x, y = move[0], move[1]
+
+    set_move(x, y, HUMAN) #< - make the move #changed
+    time.sleep(1)
 def human_turn(c_choice, h_choice):
     """
     The Human plays choosing a valid move.
@@ -256,81 +282,78 @@ def human_turn(c_choice, h_choice):
             print('Bad choice')
 
 
-def main():
+def main(start):
     """
     Main function that calls all functions
     """
-    clean()
+
+    #clean()
     h_choice = 'X'  # X or O
     c_choice = 'O'  # X or O
-    first = 'Y'  # if human is the first
+    first = start  # if h_choice (human) is the first
 
-    '''
-    # Human chooses X or O to play
-    while h_choice != 'O' and h_choice != 'X':
-        try:
-            print('')
-            h_choice = input('Choose X or O\nChosen: ').upper()
-        except (EOFError, KeyboardInterrupt):
-            print('Bye')
-            exit()
-        except (KeyError, ValueError):
-            print('Bad choice')
+    #clean()
 
-    # Setting computer's choice
-        if h_choice == 'X':
-            c_choice = 'O'
-    else:
-        c_choice = 'X'
-
-    # Human may starts first
-    '''
-    clean()
-    '''
-    while first != 'Y' and first != 'N':
-        try:
-            first = input('First to start?[y/n]: ').upper()
-        except (EOFError, KeyboardInterrupt):
-            print('Bye')
-            exit()
-        except (KeyError, ValueError):
-            print('Bad choice')
-    '''
     # Main loop of this game
     while len(empty_cells(board)) > 0 and not game_over(board):
+        #print('board:', board)
         if first == 'N':
+            print('robo-comp: ',c_choice)
             ai_turn(c_choice, h_choice)
+            #print('board:', board)
             first = ''
         #
-        #ai_turn(h_choice, c_choice)
-        human_turn(c_choice, h_choice)
+        print('robo-human: ',h_choice) #first gap!!!
+        ai_turn_h(h_choice, c_choice)
+        #print('board:', board)
+        #human_turn(c_choice, h_choice)
+        print('robo-comp: ',c_choice)
         ai_turn(c_choice, h_choice)
+        #print('board:', board)
 
     # Game over message
     if wins(board, HUMAN):
-        clean()
-        print(f'Human turn [{h_choice}]')
+        #clean()
+        print(f'Computer turn [{h_choice}]','end')
+        #print(f'Human turn [{h_choice}]')
         render(board, c_choice, h_choice)
-        print('YOU WIN!')
+        #print('board:', board)
+        print(f'YOU WIN! [{h_choice}]')
     elif wins(board, COMP):
-        clean()
-        print(f'Computer turn [{c_choice}]')
+        #clean()
+        print(f'Computer turn [{c_choice}]','end')
+        #print('board:', board)
         render(board, c_choice, h_choice)
-        print('YOU LOSE!')
+        print(f'YOU LOSE! [{c_choice}]')
     else:
-        clean()
+        #clean()
         render(board, c_choice, h_choice)
+        #print('board:', board)
         print('DRAW!')
 
     exit()
 
 HUMAN = -1 #"X"
 COMP = +1 #"O"
+'''
 board = [
     [0, 0, -1],
     [0, -1, +1],
     [+1, 0, 0],
 ]
+'''
+board = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+]
+
+start_player = 'Y' #'X' or 'O'
+if start_player =='X':
+    start = 'Y'
+else:
+    start = 'N'
+
 
 if __name__ == '__main__':
-    main()
+    main(start)
