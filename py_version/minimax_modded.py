@@ -134,7 +134,7 @@ def minimax(state, depth, player):
         best = [-1, -1, +infinity]
 
     if depth == 0 or game_over(state):
-        score = evaluate(state)
+        score = evaluate(state)#
         return [-1, -1, score]
 
     for cell in empty_cells(state):
@@ -233,9 +233,9 @@ def ai_turn_h(h_choice, c_choice):
     print(f'Computer turn [{c_choice}]')
     render(board, c_choice, h_choice)
 
-    if depth == 9: #< - end game?
-        x = choice([0, 1, 2])
-        y = choice([0, 1, 2])
+    if depth == 9: #< - start game?
+        x = choice([0, 1, 2])# not rand
+        y = choice([0, 1, 2])#
     else: # < - minimax!
         move = minimax(board, depth, HUMAN)#changed
         print('move_minimax: ',move)#DEGUB
@@ -318,6 +318,7 @@ def main(start):
         #print(f'Human turn [{h_choice}]')
         render(board, c_choice, h_choice)
         #print('board:', board)
+        #return score
         print(f'YOU WIN! [{h_choice}]')
     elif wins(board, COMP):
         #clean()
@@ -357,3 +358,5 @@ else:
 
 if __name__ == '__main__':
     main(start)
+
+
