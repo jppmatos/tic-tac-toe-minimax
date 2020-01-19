@@ -14,6 +14,8 @@ from random import choice
 import platform
 import time
 from os import system
+
+import pickle
 ##
 import generate_boards as gb
 import evaluate_board as eb
@@ -176,18 +178,13 @@ def _fitover(y, y_pred, w):
     <y_pred> is the predicted values from the genetic program, (the predicted values from the program) 
     <sample_weight> is the sample_weight vector.  (the weights to apply to each sample) 
     '''
-    #print(':',len(y_pred))#DEBUG
-    #print("_____________________")#DEBUG
     if len(y_pred) == 2:# because of the inicial y_pred ([2 2])
         return 2
-    #
-    HUMAN = -1 #"X"
+ 
+    HUMAN = -1 
     COMP = +1
-    
     X_raw = X_train
     
-    #player = HUMAN # -1
-
     score_fit = 0
     for pos in range(len(y_pred)):
         #plays as who?
@@ -197,12 +194,10 @@ def _fitover(y, y_pred, w):
             player = COMP
 
         X_pros = gb.split_3_lists(X_raw[pos])#adaptor
-        #print(X_pros)#DEBUG
         call_possible_turns = gb.possible_turns(X_pros, player)
         lista_y = [0]
         for pre_ind in call_possible_turns:
             ind = gb.merge_3_lists(pre_ind)
-            #lista_y = [0]
             num = 0
   
             while ind != X_raw[num]:
@@ -215,11 +210,11 @@ def _fitover(y, y_pred, w):
         y_max = lista_y.index(max_val_lista) #<= getMAX_list_Y(lista_y) # = lista_y.index(max(lista_y)) #: returns the position of the maximum element of list_y.
         predicted_pos = y_max# posição onde encontro o y_max em lista_y
         if y[pos] == predicted_pos:
-            score_fit += 0.1 # corrigir !!!
-    #print('score_fit: ',score_fit,'------------------------------------')#DEBUG
+            score_fit += 0.1 
+ 
     return score_fit
 
-fitover = make_fitness(_fitover, greater_is_better=True,wrap=False)# voltar a _> greater_is_betterstoping_criteria=True
+fitover = make_fitness(_fitover, greater_is_better=True,wrap=True)# voltar a _> greater_is_betterstoping_criteria=True
 def _count_paths_1(X0,X1,X2,X3,X4,X5,X6,X7,X8):
     '''
     Counts possible paths wtih 1 space of the player 
@@ -303,34 +298,63 @@ count_3 = make_function(function=_count_paths_3,
                         name='count_3',
                         arity=9)
 
-
 est_gp = SymbolicRegressor(metric=fitover,
                             function_set=[count_1,count_2,count_3,'add', 'sub', 'mul', 'div'],
-                            population_size=2,
-                            generations=4, 
+                            population_size=20,#10
+                            generations=60,#20
                             stopping_criteria=10000,
                             p_crossover=0.7, p_subtree_mutation=0.01,
                             p_hoist_mutation=0.01, p_point_mutation=0.01,
                             max_samples=0.9, verbose=1,
                             parsimony_coefficient=0.01,const_range=(-1,1),
-                            n_jobs=4)
+                            n_jobs=-1)
+
 #
 print(est_gp.fit(X_train, y_train))
 
-#print(est_gp.predict([[-1, -1, 1, 1, -1, 0, -1, 1, 0]])) #ver se há troca de jogador?
-
-#print(est_gp.get_params)
-
-#fitness find 
-#print(est_gp._program)
+print(est_gp._program)
 
 '''
+dot_data = est_gp._program.export_graphviz()
+graph = graphviz.Source(dot_data)
+graph
+'''
+
+
+#print('predict: ',est_gp.predict([[-1, -1, 1, 1, -1, 0, -1, 1, 0]])) #ver se há troca de jogador?
+
+
+def save_programe(gp_model,name):
+    """Save gp_model ou programe
+        Reuires: gp_model vaiable name, name <str> of the savefile
+        Ensures: .pkl file with the saved programe
+    """
+    f = open(name+'.pkl', 'wb')
+    pickle.dump(gp_model, f)
+    f.close()
+
+
+
+
+save_programe(est_gp,'est_gp_model')
+#print(est_gp.get_params)
+
+'''
+from IPython.display import Image
+import pydotplus
+graph = est_gp._program.export_graphviz()
+graph = pydotplus.graphviz.graph_from_dot_data(graph)
+Image(graph.create_png())
+'''
+'''
 est_gp = SymbolicRegressor(metric=fitover,
-                            function_set=['add', 'sub', 'mul', 'div', count],
-                            population_size=4,
-                            generations=2, stopping_criteria=0.01,
-                            p_crossover=0.7, p_subtree_mutation=0.1,
-                            p_hoist_mutation=0.05, p_point_mutation=0.1,
-                            max_samples=0.9, verbose=1,
-                            parsimony_coefficient=0.01,const_range=(-1,1))
+                            function_set=[count_1,count_2,count_3,'add', 'sub', 'mul', 'div'],
+                            population_size=40,
+                            generations=80, 
+                            stopping_criteria=10000,
+                            p_crossover=0.7, p_subtree_mutation=0.01,
+                            p_hoist_mutation=0.01, p_point_mutation=0.01,
+                            verbose=1,
+                            parsimony_coefficient=0.01,
+                            n_jobs=-1)
 '''

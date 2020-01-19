@@ -156,9 +156,9 @@ def ai_turn(turn,depth):#def ai_turn(c_choice, h_choice):
         y = choice([0, 1, 2])
     else: # < - minimax!
         move = minimax(board, depth, COMP)
-        print('move_minimax: ',move)#DEGUB
+        #print('move_minimax: ',move)#DEGUB
         #move = [1, 1, 0]
-        x, y = move[0], move[1] #coordenadas na matriz
+        x, y = move[0], move[1] 
     #
     p_t = player_turn('o', p_t[move-1])#(start_player, p_t[joystick])
     return p_t
@@ -167,7 +167,6 @@ def ai_turn(turn,depth):#def ai_turn(c_choice, h_choice):
     time.sleep(1)
 #-----------------------------------------------------------------------------
 
-#--------------------------------------
 def merge_3_lists(l):
     """Merge a list of 3 lits with 3 itens l into a single lits new_l"""
     new_l = [j for i in l for j in i]
@@ -214,8 +213,8 @@ def record_file(file_name,content):
     out_file.close()
 #----------------------------------------------
 def filter(X):#<- to be fixed (its inverted)
-    """Filtra tabuleiros batuteiros pela diferença entre <-1>s e <1> que seja entre [-1,0] \n
-        apenas tem-se os tabuleiros em que o foi o jogador -1 a começar
+    """Filters cheater boards by the difference between <-1> s and <1> that is between [-1,0] \n
+         you only have the boards where player -1 started
     """
     f_X = []
     for f in X:
@@ -225,14 +224,14 @@ def filter(X):#<- to be fixed (its inverted)
     
     return f_X
 
-def Make_X(X,player):#<- to be fixed (its inverted)
+def Make_X(X,player):# Not being used!
     """Makes all the possible boards , list of lists
     """
     for p in X:
         if wins(p,player*(-1)) != player*(-1):
 
             t=possible_turns(p,player)#lista de possibilidades
-            #list_p_turns = [sub_t for sub_t in t if sub_t not in X]
+          
             for sub_t in t:
                 if sub_t not in X:
                     X.append(sub_t)
@@ -243,14 +242,15 @@ def Make_X(X,player):#<- to be fixed (its inverted)
                             if sub_t not in X:
                                 X.append(sub_t)
 
-                                #return Make_X(X,player)
+                               
     X = filter(X)
     return X
 
 #---------------------------------------
 def get_num_option(X,pos,player):
-    """HUMAN = -1
-        COMP = +1
+    """get the total of all possible options and then selects the one form minimax's
+        Requires:X <list of lists> for for the board, pos <int> position on the X list of lists, player <int> HUMAN = -1 or COMP = +1
+        Ensures: returns num_turn_option <int> the turn option
         player = HUMAN
     """
     depth = X[pos][0].count(0)+X[pos][1].count(0)+X[pos][2].count(0)
@@ -263,59 +263,19 @@ def get_num_option(X,pos,player):
     if MOVE == True:
         X[pos][xx][yy]=player
     else:
-        #print('ERROR!')
         num_turn_option = 0
         return num_turn_option
-    #---
     #Get num of turn option:
     for i in range(len(call_possible_turns)):
         if call_possible_turns[i] == X[pos]:
             num_turn_option = i + 1
-    #---
-    '''
-    print(X[pos]) #minimax's best = [0, 0, -1]
-    print(call_possible_turns) #[[[1, 0, 1], [-1, -1, 0], [1, 0, -1]], [[0, 1, 1], [-1, -1, 0], [1, 0, -1]], [[0, 0, 1], [-1, -1, 1], [1, 0, -1]], [[0, 0, 1], [-1, -1, 0], [1, 1, -1]]]
-    print(num_turn_option)
-    '''
-    return(num_turn_option)
-'''
-HUMAN = -1
-COMP = +1
-player = COMP
-X=boards.X
-'''
-#Y = gb.Make_y(X)
 
-#pos = () -1 #2023 -> [[0, 0, 1], [-1, -1, 0], [1, 0, -1]]
-#print(X[pos])#DEBUG
+    return(num_turn_option)
 
 def Make_y(X,player):
     """Makes marks which option  did minimax choose to play \n
         0 -none; 1-9 position from left to right
         player is -1(HUMAN) or 1(COMP)
     """
-    #Y = [get_num_option(X,step) for step in range(10)]
     Y = [get_num_option(X,step,player) for step in range(len(X))]
     return Y
-#-------------------------------------------------------
-
-
-'''
-
-pre_X = [[[0,0,0],[0,0,0],[0,0,0]]]
-
-X = Make_X(pre_X,-1)
-Y = Make_y(X)
-
-record_file('X.txt',str(X))
-record_file('Y.txt',str(Y))
-
-'''
-'''
-def Make_y(X):#wrong
-    """Makes the solution/avaliation of each board \n
-        player_1 = -1
-    """
-    y = [wins(i,-1) for i in X]
-    return y
-'''

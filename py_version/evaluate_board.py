@@ -85,20 +85,10 @@ def count_paths_3(state,player):
         counts+=1
     return counts 
 
-#Testing
-'''
-board = [
-    [0, 0, -1],
-    [0, -1, +1],
-    [+1, 0, 0],
-]
-print('Points_1_paths: ',count_paths_1(board,-1))
-print('Points_2_paths: ',count_paths_1(board,-1))
-print('Points_3_paths: ',count_paths_2(board,-1))
-'''
-#---
-def getMAX_list_Y(l):
+
+def getMAX_list_Y(l):# Not being used!
     """
+    Get
     """
     y_max = l.index(max(l))
     return y_max
